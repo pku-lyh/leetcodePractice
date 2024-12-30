@@ -4,7 +4,7 @@
 
 返回容器可以储存的最大水量。
 
-说明：你不能倾斜容器。*/
+说明：你不能倾斜容器。 */
 public class LeetCode11 {
     public int maxArea(int[] height) {
         int n = height.length;
