@@ -1,149 +1,126 @@
-[626. 换座位](https://leetcode.cn/problems/exchange-seats/)
+[602. 好友申请 II ：谁有最多的好友](https://leetcode.cn/problems/friend-requests-ii-who-has-the-most-friends/)
 
-表: `Seat`
+`RequestAccepted` 表：
+
+```
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| requester_id   | int     |
+| accepter_id    | int     |
+| accept_date    | date    |
++----------------+---------+
+(requester_id, accepter_id) 是这张表的主键(具有唯一值的列的组合)。
+这张表包含发送好友请求的人的 ID ，接收好友请求的人的 ID ，以及好友请求通过的日期。
+```
+
+ 
+
+编写解决方案，找出拥有最多的好友的人和他拥有的好友数目。
+
+生成的测试用例保证拥有最多好友数目的只有 1 个人。
+
+```sql
+select requester_id as id, count(requester_id) as num from
+(
+select requester_id from RequestAccepted
+union all
+select accepter_id as requester_id from RequestAccepted 
+) as q
+group by id
+order by num desc
+limit 1
+```
+
+[585. 2016年的投资](https://leetcode.cn/problems/investments-in-2016/)
+
+`Insurance` 表：
+
+```
++-------------+-------+
+| Column Name | Type  |
++-------------+-------+
+| pid         | int   |
+| tiv_2015    | float |
+| tiv_2016    | float |
+| lat         | float |
+| lon         | float |
++-------------+-------+
+pid 是这张表的主键(具有唯一值的列)。
+表中的每一行都包含一条保险信息，其中：
+pid 是投保人的投保编号。
+tiv_2015 是该投保人在 2015 年的总投保金额，tiv_2016 是该投保人在 2016 年的总投保金额。
+lat 是投保人所在城市的纬度。题目数据确保 lat 不为空。
+lon 是投保人所在城市的经度。题目数据确保 lon 不为空。
+```
+
+ 
+
+编写解决方案报告 2016 年 (`tiv_2016`) 所有满足下述条件的投保人的投保金额之和：
+
+- 他在 2015 年的投保额 (`tiv_2015`) 至少跟一个其他投保人在 2015 年的投保额相同。
+- 他所在的城市必须与其他投保人都不同（也就是说 (`lat, lon`) 不能跟其他任何一个投保人完全相同）。
+
+`tiv_2016` 四舍五入的 **两位小数** 。
+
+```sql
+select round(sum(tiv_2016), 2) as tiv_2016
+from Insurance
+where tiv_2015 in
+(select tiv_2015 from Insurance group by tiv_2015 having count(tiv_2015)>1)
+and concat(lat,lon) in
+(select concat(lat,lon) from Insurance group by lat,lon having count(*) = 1)
+```
+
+
+
+[185. 部门工资前三高的所有员工](https://leetcode.cn/problems/department-top-three-salaries/)
+
+表: `Employee`
+
+```
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| id           | int     |
+| name         | varchar |
+| salary       | int     |
+| departmentId | int     |
++--------------+---------+
+id 是该表的主键列(具有唯一值的列)。
+departmentId 是 Department 表中 ID 的外键（reference 列）。
+该表的每一行都表示员工的ID、姓名和工资。它还包含了他们部门的ID。
+```
+
+ 
+
+表: `Department`
 
 ```
 +-------------+---------+
 | Column Name | Type    |
 +-------------+---------+
 | id          | int     |
-| student     | varchar |
+| name        | varchar |
 +-------------+---------+
-id 是该表的主键（唯一值）列。
-该表的每一行都表示学生的姓名和 ID。
-ID 序列始终从 1 开始并连续增加。
-```
-
-编写解决方案来交换每两个连续的学生的座位号。如果学生的数量是奇数，则最后一个学生的id不交换。
-
-按 `id` **升序** 返回结果表。
-
-```sql
-select 
-case
-when id = (select count(*) from Seat) and id % 2 = 1 then id
-when id % 2 = 1 then id + 1
-when id % 2 = 0 then id - 1
-end as id,
-student
-from Seat
-order by id 
-```
-
-
-
-[1341. 电影评分](https://leetcode.cn/problems/movie-rating/)
-
-表：`Movies`
-
-```
-+---------------+---------+
-| Column Name   | Type    |
-+---------------+---------+
-| movie_id      | int     |
-| title         | varchar |
-+---------------+---------+
-movie_id 是这个表的主键(具有唯一值的列)。
-title 是电影的名字。
-```
-
-表：`Users`
-
-```
-+---------------+---------+
-| Column Name   | Type    |
-+---------------+---------+
-| user_id       | int     |
-| name          | varchar |
-+---------------+---------+
-user_id 是表的主键(具有唯一值的列)。
-'name' 列具有唯一值。
-```
-
-表：`MovieRating`
-
-```
-+---------------+---------+
-| Column Name   | Type    |
-+---------------+---------+
-| movie_id      | int     |
-| user_id       | int     |
-| rating        | int     |
-| created_at    | date    |
-+---------------+---------+
-(movie_id, user_id) 是这个表的主键(具有唯一值的列的组合)。
-这个表包含用户在其评论中对电影的评分 rating 。
-created_at 是用户的点评日期。 
+id 是该表的主键列(具有唯一值的列)。
+该表的每一行表示部门ID和部门名。
 ```
 
  
 
-请你编写一个解决方案：
+公司的主管们感兴趣的是公司每个部门中谁赚的钱最多。一个部门的 **高收入者** 是指一个员工的工资在该部门的 **不同** 工资中 **排名前三** 。
 
-- 查找评论电影数量最多的用户名。如果出现平局，返回字典序较小的用户名。
-- 查找在 `February 2020` **平均评分最高** 的电影名称。如果出现平局，返回字典序较小的电影名称。
+编写解决方案，找出每个部门中 **收入高的员工** 。
 
-**字典序** ，即按字母在字典中出现顺序对字符串排序，字典序较小则意味着排序靠前。
-
-```sql
-(
-select u.name as results
-from (Movies as m right join MovieRating as r on m.movie_id = r.Movie_id) 
-left join Users as u on u.user_id = r.user_id
-group by u.user_id
-having count(*) = 
-(select count(*) as cnt from MovieRating group by user_id order by cnt desc limit 1)
-order by results
-limit 1 
-)
-UNION ALL
-(
-select m.title as results
-from (Movies as m right join MovieRating as r on m.movie_id = r.Movie_id) 
-left join Users as u on u.user_id = r.user_id
-where year(r.created_at) = 2020 and month(r.created_at) = 2
-group by m.movie_id
-having avg(r.rating) = 
-(select avg(rating) as cnt from MovieRating where year(created_at) = 2020 and month(created_at) = 2 group by movie_id order by cnt desc limit 1)
-order by results
-limit 1
-)
-```
-
-
-
-[1321. 餐馆营业额变化增长](https://leetcode.cn/problems/restaurant-growth/)
-
-表: `Customer`
-
-```
-+---------------+---------+
-| Column Name   | Type    |
-+---------------+---------+
-| customer_id   | int     |
-| name          | varchar |
-| visited_on    | date    |
-| amount        | int     |
-+---------------+---------+
-在 SQL 中，(customer_id, visited_on) 是该表的主键。
-该表包含一家餐馆的顾客交易数据。
-visited_on 表示 (customer_id) 的顾客在 visited_on 那天访问了餐馆。
-amount 是一个顾客某一天的消费总额。
-```
-
- 
-
-你是餐馆的老板，现在你想分析一下可能的营业额变化增长（每天至少有一位顾客）。
-
-计算以 7 天（某日期 + 该日期前的 6 天）为一个时间段的顾客消费平均值。`average_amount` 要 **保留两位小数。**
-
-结果按 `visited_on` **升序排序**。
+以 **任意顺序** 返回结果表。
 
 ```sql
-select c1.visited_on, sum(c2.amount) as amount, round(sum(c2.amount)/7,2) as average_amount
-from ( SELECT DISTINCT visited_on FROM customer ) as c1 inner join Customer as c2 
-ON datediff( c1.visited_on, c2.visited_on ) BETWEEN 0 AND 6 
-where c1.visited_on >= (SELECT min( visited_on ) FROM customer ) + 6 
-group by c1.visited_on
+select d.name as DepartMent, e1.name as Employee, e1.salary 
+from Employee as e1
+left join Department as d
+on e1.departmentId = d.id
+where 3>
+(select count(distinct(e2.salary)) from Employee as e2 where e2.salary > e1.salary and e1.departmentId = e2.departmentId)
 ```
 
