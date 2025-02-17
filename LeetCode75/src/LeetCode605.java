@@ -23,7 +23,10 @@ public class LeetCode605 {
                 flowerbed[i] = 1;
                 res++;
             }
+            if(res >= n){
+                return true;
+            }
         }
-        return res >= n;
+        return false;
     }
 }

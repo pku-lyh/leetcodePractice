@@ -5,19 +5,19 @@
 //结论：如果两个字符串能被一个字符串同时整除，那么该字符串长度就是他们的最大公因数
 public class LeetCode1071 {
     public String gcdOfStrings(String str1, String str2) {
-        if (!str1.concat(str2).equals(str2.concat(str1))) {
+        if (!(str1 + str2).equals(str2 + str1)) {
             return "";
         }
         return str1.substring(0, gcd(str1.length(), str2.length()));
     }
 
-    public int gcd(int i, int j) {
-        int remind = i % j;
-        while (remind != 0) {
-            i = j;
-            j = remind;
-            remind = i % j;
+    public int gcd(int a, int b) {
+        int remainder = a % b;
+        while (remainder != 0) {
+            a = b;
+            b = remainder;
+            remainder = a % b;
         }
-        return j;
+        return b;
     }
 }

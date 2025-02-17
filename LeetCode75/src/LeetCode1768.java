@@ -5,19 +5,17 @@
 public class LeetCode1768 {
     public String mergeAlternately(String word1, String word2) {
         StringBuilder ans = new StringBuilder();
-        int length = Math.min(word1.length(), word2.length());
-        for(int i =0;i<length;i++){
-            ans.append(word1.charAt(i));
-            ans.append(word2.charAt(i));
+        int i = 0, j = 0;
+        int n1 = word1.length();
+        int n2 = word2.length();
+        while (i < n1 && j < n2) {
+            ans.append(word1.charAt(i++));
+            ans.append(word2.charAt(j++));
         }
-        if(word1.length() == length){
-            for(int j =length;j<word2.length();j++){
-                ans.append(word2.charAt(j));
-            }
-        }else{
-            for(int j =length;j<word1.length();j++){
-                ans.append(word1.charAt(j));
-            }
+        if (j < n2) {
+            ans.append(word2, j, n1);
+        } else if(i < n1){
+            ans.append(word1, i, n1);
         }
         return ans.toString();
     }
