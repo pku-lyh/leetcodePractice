@@ -22,6 +22,7 @@ public class LeetCode33 {
                     left = mid + 1;
                 }
             } else {
+                // 说明右边升序排列
                 if (nums[mid] < target && target <= nums[right]) {
                     left = mid + 1;
                 } else {

@@ -2,79 +2,83 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LRUCache {
-    Map<Integer, DlinkNode> map;
-    DlinkNode head;
-    DlinkNode tail;
-    int capacity;
     int size;
+    int capacity;
+    DLinkedNode head, tail;
+    Map<Integer, DLinkedNode> cache;
 
     public LRUCache(int capacity) {
-        this.capacity = capacity;
         this.size = 0;
-        map = new HashMap<>();
-        head = new DlinkNode();
-        tail = new DlinkNode();
+        this.capacity = capacity;
+        cache = new HashMap<>();
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
         head.next = tail;
         tail.prev = head;
     }
 
     public int get(int key) {
-        if (map.containsKey(key)) {
-            DlinkNode node = map.get(key);
-            moveToHead(node);
-            return node.value;
-        } else {
-            return -1;
-        }
+       DLinkedNode node = cache.get(key);
+       if (node != null){
+           // 移动到头部
+           moveToHead(node);
+           return node.value;
+       }
+       return -1;
     }
 
-    public void put(int key, int value) {
-        if (map.containsKey(key)) {
-            DlinkNode node = map.get(key);
-            node.value = value;
-            moveToHead(node);
-        } else {
-            map.put(key, new DlinkNode(key, value));
-            size++;
-            addToHead(map.get(key));
-            if (size > capacity) {
-                map.remove(tail.prev.key);
-                removeNode(tail.prev);
-                size--;
-            }
-        }
-    }
-
-
-    private void moveToHead(DlinkNode node) {
-        removeNode(node);
-        addToHead(node);
-    }
-
-    private void addToHead(DlinkNode node) {
+    private void moveToHead(DLinkedNode node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+        node.prev = head;
         node.next = head.next;
         head.next.prev = node;
         head.next = node;
-        node.prev = head;
     }
 
-    private void removeNode(DlinkNode node) {
-        node.prev.next = node.next;
-        node.next.prev = node.prev;
-    }
-
-    static class DlinkNode {
-        int key;
-        int value;
-        DlinkNode next;
-        DlinkNode prev;
-
-        public DlinkNode() {
+    public void put(int key, int value) {
+        DLinkedNode node = cache.get(key);
+        if (node == null){
+            // 新建节点
+            DLinkedNode newNode = new DLinkedNode(key, value);
+            cache.put(key, newNode);
+            addToHead(newNode);
+            size++;
+            if (size > capacity){
+                DLinkedNode node1 = deleteNode(tail.prev);
+                cache.remove(node1.key);
+                size--;
+            }
+        }else {
+            // 移动到头部
+            node.value = value;
+            moveToHead(node);
         }
 
-        public DlinkNode(int key, int value) {
-            this.key = key;
-            this.value = value;
+    }
+
+    private DLinkedNode deleteNode(DLinkedNode node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+        return node;
+    }
+
+    private void addToHead(DLinkedNode newNode) {
+        newNode.prev = head;
+        newNode.next = head.next;
+        head.next.prev = newNode;
+        head.next = newNode;
+    }
+
+    class DLinkedNode{
+        int key;
+        int value;
+        DLinkedNode prev;
+        DLinkedNode next;
+        public DLinkedNode(){}
+        public DLinkedNode(int _key, int _value){
+            key = _key;
+            value = _value;
         }
     }
 }

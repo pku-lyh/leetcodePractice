@@ -1,50 +1,51 @@
+
 public class LeetCode912 {
     public static int[] sortArray(int[] nums) {
         if (nums == null || nums.length < 1) {
             return nums;
         }
-        mergeSort(nums, 0, nums.length - 1);
+        int n = nums.length;
+        quickSort(nums, 0, n - 1);
         return nums;
     }
 
-    private static void mergeSort(int[] nums, int left, int right) {
+    private static void quickSort(int[] nums, int left, int right) {
         if (left >= right) {
             return;
         }
-        int mid = left + (right - left) / 2;
-        mergeSort(nums, left, mid);
-        mergeSort(nums, mid + 1, right);
-        merge(nums, left, mid, right);
+        int pivot = partition(nums, left, right);
+        quickSort(nums, left, pivot - 1);
+        quickSort(nums, pivot + 1, right);
     }
 
-    private static void merge(int[] nums, int left, int mid, int right) {
-        int[] temp = new int[nums.length];
-        int n = left;
-        int i = left, j = mid+1;
-        while (i <= mid && j <= right) {
-            if (nums[i] < nums[j]){
-                temp[n++] = nums[i++];
-            }else {
-                temp[n++] = nums[j++];
+    private static int partition(int[] nums, int left, int right) {
+        int pivot = nums[left];
+        int i = left + 1;
+        int j = right;
+       while (i <= j) {
+            while (i <= j && nums[i] <= pivot) {
+                i++;
+            }
+            while (i <= j && nums[j] > pivot) {
+                j--;
+            }
+            if (i < j) {
+                swap(nums, i, j);
             }
         }
-        if (i>mid){
-            while (j<=right){
-                temp[n++] = nums[j++];
-            }
-        }else {
-            while (i<=mid){
-                temp[n++] = nums[i++];
-            }
-        }
-        while (left<=right){
-            nums[left] = temp[left];
-            left++;
-        }
+        swap(nums, left, j);
+        return j;
     }
+
+    private static void swap(int[] nums, int left, int j) {
+        int temp = nums[left];
+        nums[left] = nums[j];
+        nums[j] = temp;
+    }
+
 
     public static void main(String[] args) {
-        int[] nums = new int[]{5,1,1,2,0,0};
+        int[] nums = new int[]{110, 100, 0};
         sortArray(nums);
     }
 }
