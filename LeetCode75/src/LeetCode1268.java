@@ -55,38 +55,38 @@ public class LeetCode1268 {
         }
     }
     public List<List<String>> suggestedProducts(String[] products, String searchWord) {
-        List<List<String>> ans = new ArrayList<>();
-        Trie root = new Trie();
-        for (String product : products) {
-            root.insert(product);
-        }
-        for (int i = 0; i < searchWord.length(); i++) {
-            List<String> list = new ArrayList<>();
-            StringBuffer stringBuffer = new StringBuffer();
-            String prefix = searchWord.substring(0, i + 1);
-            stringBuffer.append(prefix);
-            Trie node = root.startsWith(prefix);
-            if (node != null) {
-                backTrack(node, list, stringBuffer);
-            }
-            ans.add(list);
-        }
-        return ans;
+      List<List<String>> ans = new ArrayList<>();
+      Trie tree = new Trie();
+      // 将所有产品插入到字典树中
+      for (String product : products) {
+          tree.insert(product);
+      }
+      for (int i = 1; i <= searchWord.length(); i++) {
+          String prefix = searchWord.substring(0, i);
+          List<String> list = new ArrayList<>();
+          Trie node = tree.startsWith(prefix);
+          if (node != null) {
+              backTrack(list, new StringBuilder(prefix), node);
+          }
+          ans.add(list);
+      }
+      return ans;
     }
 
-    private void backTrack(Trie node, List<String> list, StringBuffer stringBuffer) {
+    private void backTrack(List<String> list, StringBuilder sb, Trie node) {
+        if (node == null){
+            return;
+        }
         if (list.size() == 3) {
             return;
         }
         if (node.isEnd) {
-            list.add(stringBuffer.toString());
+            list.add(sb.toString());
         }
         for (int i = 0; i < 26; i++) {
-            if (node.children[i] != null) {
-                stringBuffer.append((char) (i + 'a'));
-                backTrack(node.children[i], list, stringBuffer);
-                stringBuffer.deleteCharAt(stringBuffer.length() - 1);
-            }
+            sb.append((char) ('a' + i));
+            backTrack(list, sb, node.children[i]);
+            sb.deleteCharAt(sb.length() - 1);
         }
     }
 }

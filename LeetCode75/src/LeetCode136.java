@@ -5,6 +5,7 @@ public class LeetCode136 {
     public int singleNumber(int[] nums) {
         int ans = 0;
         for (int num : nums) {
+            // 异或操作，相同的数字抑或会等于0
             ans ^= num;
         }
         return ans;
